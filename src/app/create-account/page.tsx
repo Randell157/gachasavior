@@ -37,7 +37,7 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <h1>Create Account Page</h1>
+        
       </main>
       <footer className="w-full py-6 border-t">
         <div className="container px-4 md:px-6 mx-auto flex flex-col sm:flex-row justify-between items-center">

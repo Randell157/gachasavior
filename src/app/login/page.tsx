@@ -12,6 +12,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    //Testing login
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Login attempted with:", { email, password });
@@ -63,11 +64,8 @@ export default function LoginPage() {
           <div className="w-full max-w-md space-y-8">
             <div>
               <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Login to Gacha Savior
+                Enter Login Information
               </h2>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                Enter your credentials to access your account
-              </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-md shadow-sm -space-y-px">
