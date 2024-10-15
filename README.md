@@ -7,3 +7,5 @@ This is a website that allows people to track and organize their information for
 Using Vercel to host the website for now: https://gachasavior.vercel.app/
 
 //For Dev: npm run dev
+
+Using shadcn/ui component library with Lucide React Icons
