@@ -52,7 +52,7 @@ export default function Home() {
                 <div className="flex-shrink-0 mr-4">
                   <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200">
                     <Image
-                      src="/pfp.jpg"
+                      src="/Pfp.jpg"
                       alt="Creator's picture"
                       width={128}
                       height={128}
