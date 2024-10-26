@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useRouter } from "next/router";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +36,18 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
