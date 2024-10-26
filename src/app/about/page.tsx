@@ -62,7 +62,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900">
-                    Hello! I'm Randell
+                    Hello! I&apos;m Randell
                   </h2>
                   <p className="mt-1 max-w-2xl text-sm text-gray-500">
                     Undergraduate Student
@@ -76,7 +76,7 @@ export default function Home() {
                       Who am I
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      My name is Randell Lapid. I'm currently a senior
+                      My name is Randell Lapid. I&apos;m currently a senior
                       undergraduate for CSUF.
                     </dd>
                   </div>
