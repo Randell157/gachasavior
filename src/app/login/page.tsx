@@ -2,28 +2,33 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useRouter } from "next/router";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    //Testing login
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login attempted with:", { email, password });
-      alert("Login successful!");
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed. Please try again.");
+      setError("Login Failed. Pleast try again.");
+      console.error("Login Failed:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center justify-center">
