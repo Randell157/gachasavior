@@ -4,22 +4,20 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      router.push("/dashboard");
-    }
-  }, [user, loading, router]);
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,25 +25,37 @@ export default function LoginPage() {
     setError("");
 
     try {
+      let email = identifier;
+      // If the identifier is not an email, assume it's a username and look up the email
+      if (!identifier.includes("@")) {
+        const db = getFirestore();
+        const usernameDoc = await getDoc(doc(db, "usernames", identifier));
+        if (usernameDoc.exists()) {
+          const uid = usernameDoc.data().uid;
+          const userDoc = await getDoc(doc(db, "users", uid));
+          email = userDoc.data()?.email;
+        } else {
+          throw new Error("Username not found");
+        }
+      }
+
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
     } catch (error) {
-      setError("Login Failed. Pleast try again.");
-      console.error("Login Failed:", error);
+      setError(
+        "Failed to log in. Please check your credentials and try again."
+      );
+      console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!isClient) {
+    return null; // Return null on the server side and during initial client-side render
+  }
+
   if (typeof window === "undefined") {
-    return null;
-  }
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (user) {
     return null;
   }
 
@@ -96,18 +106,18 @@ export default function LoginPage() {
               <div className="rounded-md shadow-sm -space-y-px">
                 <div>
                   <label htmlFor="email" className="sr-only">
-                    Email address
+                    Email address or Username
                   </label>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="identifier"
+                    name="identifier"
+                    type="text"
                     autoComplete="email"
                     required
                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address or Username"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                   />
                 </div>
                 <div>
