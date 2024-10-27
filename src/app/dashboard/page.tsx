@@ -88,7 +88,7 @@ export default function DashboardPage() {
                     <h2 className="text-3xl font-extrabold text-gray-900">
                       Welcome to your Dashboard
                     </h2>
-                    <p className="text-xl">Hello, {user.email}!</p>
+                    <p className="text-xl">Hello, {user.displayName}!</p>
                     <p></p>
                   </div>
                   <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
