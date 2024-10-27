@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
@@ -14,10 +15,21 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleRedirect = useCallback(() => {
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    handleRedirect();
+  }, [handleRedirect]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +68,10 @@ export default function LoginPage() {
   }
 
   if (typeof window === "undefined") {
+    return null;
+  }
+
+  if (user) {
     return null;
   }
 

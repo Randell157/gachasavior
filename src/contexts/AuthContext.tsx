@@ -39,6 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (user) {
           router.push("/dashboard");
         }
+        else{
+          router.push('/login')
+        }
       }
     });
 

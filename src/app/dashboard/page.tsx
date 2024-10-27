@@ -2,19 +2,28 @@
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export default function DashboardPage() {
-  const { user, username, loading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleRedirect = useCallback(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    handleRedirect();
+  }, [handleRedirect]);
 
   const handleLogout = async () => {
     try {
@@ -25,13 +34,14 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!isClient || loading) {
+    return null;
   }
 
   if (!user) {
     return null;
   }
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center justify-center">
@@ -78,7 +88,7 @@ export default function DashboardPage() {
                     <h2 className="text-3xl font-extrabold text-gray-900">
                       Welcome to your Dashboard
                     </h2>
-                    <p className="text-xl">Hello, {username || user.email}!</p>
+                    <p className="text-xl">Hello, {user.email}!</p>
                     <p></p>
                   </div>
                   <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
