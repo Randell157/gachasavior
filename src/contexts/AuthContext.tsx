@@ -1,43 +1,56 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { onAuthStateChanged, User } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '@/lib/firebase'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
 
 interface AuthContextType {
-  user: User | null
-  username: string | null
-  loading: boolean
+  user: User | null;
+  loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, username: null, loading: true })
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+});
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [username, setUsername] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const isMounted = useRef(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user)
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid))
-        setUsername(userDoc.data()?.username || null)
-      } else {
-        setUsername(null)
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (isMounted.current) {
+        setUser(user);
+        setLoading(false);
+        if (user) {
+          router.push("/dashboard");
+        }
       }
-      setLoading(false)
-    })
+    });
 
-    return () => unsubscribe()
-  }, [])
+    return () => {
+      unsubscribe();
+      isMounted.current = false;
+    };
+  }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, username, loading }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
