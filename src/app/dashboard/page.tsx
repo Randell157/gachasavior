@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import Genshin from "@/components/ui/Genshin";
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
@@ -87,27 +88,20 @@ export default function DashboardPage() {
       </header>
       <main className="flex-1">
         <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-          <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-            <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-              <div className="max-w-md mx-auto">
-                <div className="divide-y divide-gray-200">
-                  <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                    <h2 className="text-3xl font-extrabold text-gray-900">
-                      Welcome to your Dashboard
-                    </h2>
-                    <p className="text-xl">Hello, {username || "User"}!</p>
-                    <p></p>
-                  </div>
-                  <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
-                    <button
-                      onClick={handleLogout}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
+          <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+            <div className="divide-y divide-gray-200">
+              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                <p className="text-xl">Hello, {username || "User"}!</p>
+                <p></p>
+              </div>
+              <Genshin />
+              <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>
