@@ -39,19 +39,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isMounted = useRef(true);
 
   useEffect(() => {
-    console.log("AuthProvider mounted");
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user) => {
-        console.log("Auth state changed", { user });
         if (isMounted.current) {
           setUser(user);
           if (user) {
             try {
               const userDoc = await getDoc(doc(db, "users", user.uid));
-              console.log("User document fetched", {
-                exists: userDoc.exists(),
-              });
               if (userDoc.exists()) {
                 setUsername(userDoc.data().username);
               }

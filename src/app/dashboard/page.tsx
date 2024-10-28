@@ -13,13 +13,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setIsClient(true);
-    console.log("Dashboard mounted, isClient set to true");
   }, []);
 
   const handleRedirect = useCallback(() => {
-    console.log("handleRedirect called", { loading, user });
     if (!loading && !user) {
-      console.log("Redirecting to login");
       router.push("/login");
     }
   }, [user, loading, router]);
@@ -37,14 +34,8 @@ export default function DashboardPage() {
     }
   };
 
-  console.log("Dashboard render", { isClient, loading, user, username, error });
-
   if (!isClient || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return null;
   }
 
   if (error) {
@@ -56,11 +47,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        No user found, redirecting...
-      </div>
-    );
+    return null;
   }
 
   return (
