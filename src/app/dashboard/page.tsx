@@ -8,7 +8,7 @@ import { auth } from "@/lib/firebase";
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, username, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function DashboardPage() {
                     <h2 className="text-3xl font-extrabold text-gray-900">
                       Welcome to your Dashboard
                     </h2>
-                    <p className="text-xl">Hello, {user.displayName}!</p>
+                    <p className="text-xl">Hello, {username || "User"}!</p>
                     <p></p>
                   </div>
                   <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">

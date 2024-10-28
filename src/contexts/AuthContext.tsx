@@ -8,16 +8,19 @@ import React, {
   useRef,
 } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 
 interface AuthContextType {
   user: User | null;
+  username: string | null;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  username: null,
   loading: true,
 });
 
@@ -27,21 +30,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const isMounted = useRef(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (isMounted.current) {
         setUser(user);
-        setLoading(false);
         if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setUsername(userDoc.data().username);
+          }
           router.push("/dashboard");
+        } else {
+          setUsername(null);
+          router.push("/");
         }
-        else{
-          router.push('/')
-        }
+        setLoading(false);
       }
     });
 
@@ -52,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, username, loading }}>
       {children}
     </AuthContext.Provider>
   );
