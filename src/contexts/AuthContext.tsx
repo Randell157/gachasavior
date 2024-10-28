@@ -16,12 +16,14 @@ interface AuthContextType {
   user: User | null;
   username: string | null;
   loading: boolean;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   username: null,
   loading: true,
+  error: null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -32,26 +34,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const isMounted = useRef(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (isMounted.current) {
-        setUser(user);
-        if (user) {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            setUsername(userDoc.data().username);
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (user) => {
+        if (isMounted.current) {
+          setUser(user);
+          if (user) {
+            try {
+              const userDoc = await getDoc(doc(db, "users", user.uid));
+              if (userDoc.exists()) {
+                setUsername(userDoc.data().username);
+              }
+              router.push("/dashboard");
+            } catch (err) {
+              console.error("Error fetching user data:", err);
+              setError("Failed to fetch user data. Please try again.");
+            }
+          } else {
+            setUsername(null);
+            router.push("/");
           }
-          router.push("/dashboard");
-        } else {
-          setUsername(null);
-          router.push("/");
+          setLoading(false);
         }
+      },
+      (err) => {
+        console.error("Auth state change error:", err);
+        setError("Authentication error. Please try again.");
         setLoading(false);
       }
-    });
+    );
 
     return () => {
       unsubscribe();
@@ -60,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, username, loading }}>
+    <AuthContext.Provider value={{ user, username, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

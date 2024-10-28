@@ -8,7 +8,7 @@ import { auth } from "@/lib/firebase";
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
-  const { user, username, loading } = useAuth();
+  const { user, username, loading, error } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,6 +36,14 @@ export default function DashboardPage() {
 
   if (!isClient || loading) {
     return null;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
   }
 
   if (!user) {
