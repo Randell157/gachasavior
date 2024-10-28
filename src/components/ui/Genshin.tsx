@@ -1,75 +1,93 @@
-'use client'
+"use client";
 
-import { useState, useCallback } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
+import { useState, useCallback, useRef } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 interface GenshinData {
-  characters: Array<{ key: string; level: number; constellation: number }>
-  weapons: Array<{ key: string; level: number; refinement: number }>
-  artifacts: Array<any>
-  materials: Record<string, number>
+  characters: Array<{ key: string; level: number; constellation: number }>;
+  weapons: Array<{ key: string; level: number; refinement: number }>;
+  artifacts: Array<any>;
+  materials: Record<string, number>;
 }
 
 const emptyData: GenshinData = {
   characters: [],
   weapons: [],
   artifacts: [],
-  materials: {}
-}
+  materials: {},
+};
 
 export default function Genshin() {
-  const [activeTab, setActiveTab] = useState("characters")
-  const [genshinData, setGenshinData] = useState<GenshinData>(emptyData)
+  const [activeTab, setActiveTab] = useState("characters");
+  const [genshinData, setGenshinData] = useState<GenshinData>(emptyData);
+  const fileInputRef = useRef<HTMLInputElement>(null); // Create ref for file input
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        try {
-          const json = JSON.parse(e.target?.result as string)
-          setGenshinData(json)
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
-          alert("Error parsing JSON file. Please make sure it's a valid Genshin Impact data file.")
+  const handleFileUpload = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        // Check if the uploaded file is a JSON file
+        if (file.type !== "application/json") {
+          alert("Please upload a valid JSON file.");
+          return;
         }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const json = JSON.parse(e.target?.result as string);
+            setGenshinData(json);
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            alert(
+              "Error parsing JSON file. Please make sure it's a valid Genshin Impact data file."
+            );
+          }
+        };
+        reader.readAsText(file);
       }
-      reader.readAsText(file)
-    }
-  }, [])
+    },
+    []
+  );
 
-  const characterCount = genshinData.characters.length
-  const weaponCount = genshinData.weapons.length
-  const artifactCount = genshinData.artifacts.length
+  const handleButtonClick = () => {
+    fileInputRef.current?.click(); 
+  };
+
+  const characterCount = genshinData.characters.length;
+  const weaponCount = genshinData.weapons.length;
+  const artifactCount = genshinData.artifacts.length;
 
   const topCharacters = genshinData.characters
     .sort((a, b) => b.level - a.level)
-    .slice(0, 5)
+    .slice(0, 5);
 
   const topWeapons = genshinData.weapons
     .sort((a, b) => b.level - a.level)
-    .slice(0, 5)
+    .slice(0, 5);
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Genshin Impact </h1>
-      
       <div className="mb-6">
         <input
+          ref={fileInputRef}
           type="file"
           accept=".json"
           onChange={handleFileUpload}
           className="hidden"
-          id="file-upload"
         />
-        <label htmlFor="file-upload">
-          <Button>Upload Genshin Data JSON</Button>
-        </label>
+        <Button onClick={handleButtonClick}>Upload Genshin Data JSON</Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
           <CardHeader>
@@ -118,7 +136,8 @@ export default function Genshin() {
                   <ul>
                     {topCharacters.map((char, index) => (
                       <li key={index} className="mb-2">
-                        <span className="font-bold">{char.key}</span> - Level {char.level}, Constellation {char.constellation}
+                        <span className="font-bold">{char.key}</span> - Level{" "}
+                        {char.level}, Constellation {char.constellation}
                       </li>
                     ))}
                   </ul>
@@ -141,7 +160,8 @@ export default function Genshin() {
                   <ul>
                     {topWeapons.map((weapon, index) => (
                       <li key={index} className="mb-2">
-                        <span className="font-bold">{weapon.key}</span> - Level {weapon.level}, Refinement {weapon.refinement}
+                        <span className="font-bold">{weapon.key}</span> - Level{" "}
+                        {weapon.level}, Refinement {weapon.refinement}
                       </li>
                     ))}
                   </ul>
@@ -180,5 +200,5 @@ export default function Genshin() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
