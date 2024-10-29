@@ -8,6 +8,7 @@ import { doc, setDoc, getFirestore } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
 
 export default function CreateAccountPage() {
+  //Input States
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,15 +18,18 @@ export default function CreateAccountPage() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
+  //Client side rendering
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  //Form submission when button is clicked
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
+    //Validating password
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
@@ -33,6 +37,7 @@ export default function CreateAccountPage() {
     }
 
     try {
+      // Creating a new user account in Firebase
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -40,7 +45,8 @@ export default function CreateAccountPage() {
       );
       const user = userCredential.user;
       const db = getFirestore();
-
+      
+      //Store user data in Firebase
       await setDoc(doc(db, "users", user.uid), {
         username,
         email,
@@ -52,6 +58,7 @@ export default function CreateAccountPage() {
         uid: user.uid,
       });
 
+      //Redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       setError("Failed to create account. Please try again.");
