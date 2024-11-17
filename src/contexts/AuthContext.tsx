@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 
 interface AuthContextType {
