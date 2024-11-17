@@ -16,15 +16,11 @@ export default function DashboardPage() {
     setIsClient(true);
   }, []);
 
-  const handleRedirect = useCallback(() => {
+  useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
-
-  useEffect(() => {
-    handleRedirect();
-  }, [handleRedirect]);
 
   const handleLogout = async () => {
     try {

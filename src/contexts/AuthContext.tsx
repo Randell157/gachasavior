@@ -36,31 +36,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const isMounted = useRef(true);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user) => {
-        if (isMounted.current) {
-          setUser(user);
+        setUser(user);
+        setLoading(true);
           if (user) {
             try {
               const userDoc = await getDoc(doc(db, "users", user.uid));
               if (userDoc.exists()) {
                 setUsername(userDoc.data().username);
               }
-              router.push("/dashboard");
             } catch (err) {
               console.error("Error fetching user data:", err);
               setError("Failed to fetch user data. Please try again.");
             }
           } else {
             setUsername(null);
-            router.push("/");
           }
           setLoading(false);
-        }
       },
       (err) => {
         console.error("Auth state change error:", err);
@@ -71,9 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return () => {
       unsubscribe();
-      isMounted.current = false;
     };
-  }, [router]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, username, loading, error }}>
