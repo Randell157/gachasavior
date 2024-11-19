@@ -1,3 +1,4 @@
+import GenshinFeatures from "@/components/GenshinFeatures";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 export default function FeaturesPage() {
@@ -6,8 +7,7 @@ export default function FeaturesPage() {
       <Header />
       <main className="flex-1">
         <div>
-          <h1 className="text-4xl font-bold text-center my-8">Features</h1>
-
+          <GenshinFeatures />
         </div>
       </main>
       <Footer />
