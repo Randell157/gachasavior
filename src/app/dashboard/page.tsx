@@ -7,14 +7,22 @@ import { auth } from "@/lib/firebase";
 import Genshin from "@/components/Genshin";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const { user, username, loading, error } = useAuth();
   const router = useRouter();
+  const [genshinData, setGenshinData] = useState(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const savedData = localStorage.getItem(`genshinData_${user?.uid}`);
+    if (savedData) {
+      setGenshinData(JSON.parse(savedData));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,6 +36,25 @@ export default function DashboardPage() {
       router.push("/login");
     } catch (error) {
       console.error("Failed to log out", error);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const json = JSON.parse(e.target?.result as string);
+          setGenshinData(json);
+          // Save to localStorage
+          localStorage.setItem(`genshinData_${user?.uid}`, JSON.stringify(json));
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          alert("Error parsing JSON file. Please make sure it's a valid Genshin Impact data file.");
+        }
+      };
+      reader.readAsText(file);
     }
   };
 
@@ -56,16 +83,30 @@ export default function DashboardPage() {
             <div className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                 <p className="text-xl">Hello, {username || "User"}!</p>
-                <p></p>
+                <div>
+                  <Input
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileUpload}
+                    className="mb-4"
+                  />
+                  {/* {genshinData && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Imported Genshin Impact Data:
+                      </h3>
+                      <pre className="bg-gray-100 p-4 rounded-md overflow-auto max-h-60">
+                        {JSON.stringify(genshinData, null, 2)}
+                      </pre>
+                    </div>
+                  )} */}
+                </div>
               </div>
-              <Genshin />
+              <Genshin data={genshinData} />
               <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
+                <Button onClick={handleLogout} variant="destructive">
                   Logout
-                </button>
+                </Button>
               </div>
             </div>
           </div>
