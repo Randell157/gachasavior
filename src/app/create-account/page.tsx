@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getFirestore } from "firebase/firestore";
 import { auth } from "@/lib/firebase";
-
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 export default function CreateAccountPage() {
   //Input States
   const [username, setUsername] = useState("");
@@ -45,7 +46,7 @@ export default function CreateAccountPage() {
       );
       const user = userCredential.user;
       const db = getFirestore();
-      
+
       //Store user data in Firebase
       await setDoc(doc(db, "users", user.uid), {
         username,
@@ -78,39 +79,7 @@ export default function CreateAccountPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center justify-center">
-        <div className="container flex items-center justify-between">
-          <Link className="flex items-center justify-center" href="/">
-            <span className="font-bold">Gacha Savior</span>
-          </Link>
-          <nav className="flex gap-4 sm:gap-6">
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/features"
-            >
-              Features
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/about"
-            >
-              About
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/contact"
-            >
-              Contact
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/login"
-            >
-              Login
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
       <main className="flex-1">
         <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="w-full max-w-md space-y-8">
@@ -212,27 +181,7 @@ export default function CreateAccountPage() {
           </div>
         </div>
       </main>
-      <footer className="w-full py-6 border-t">
-        <div className="container px-4 md:px-6 mx-auto flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            © 2024 Gacha Savior. All rights reserved.
-          </p>
-          <nav className="flex gap-4 sm:gap-6 mt-4 sm:mt-0">
-            <Link
-              className="text-xs hover:underline underline-offset-4"
-              href="/terms"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              className="text-xs hover:underline underline-offset-4"
-              href="/privacy"
-            >
-              Privacy
-            </Link>
-          </nav>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
