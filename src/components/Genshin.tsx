@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface GenshinData {
@@ -22,10 +23,28 @@ interface GenshinProps {
   data: GenshinData | null;
 }
 
+function formatCharacterIconFilename(characterKey: string): string {
+  // List of characters with special naming conventions
+  const specialNames: { [key: string]: string } = {
+    "kazuha": "Kaedehara_Kazuha",
+    "hutao": "Hu_Tao",
+    "ayaka": "Kamisato_Ayaka",
+  };
+
+  // Check if the character has more than 1 name
+  const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, '');
+  if (lowerCaseKey in specialNames) {
+    return `${specialNames[lowerCaseKey]}_Icon.png`;
+  }
+
+  // For characters without special names, use the original key
+  return `${characterKey}_Icon.png`;
+}
+
 export default function Genshin({ data }: GenshinProps) {
   const [activeTab, setActiveTab] = useState("characters");
 
-  if (!data){
+  if (!data) {
     return <p>Please upload a valid JSON file</p>;
   }
 
@@ -37,9 +56,7 @@ export default function Genshin({ data }: GenshinProps) {
     .sort((a, b) => b.level - a.level)
     .slice(0, 5);
 
-  const topWeapons = data.weapons
-    .sort((a, b) => b.level - a.level)
-    .slice(0, 5);
+  const topWeapons = data.weapons.sort((a, b) => b.level - a.level).slice(0, 5);
 
   return (
     <div className="container mx-auto p-4">
@@ -87,13 +104,33 @@ export default function Genshin({ data }: GenshinProps) {
               <CardDescription>Highest level characters</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[300px]">
+              <ScrollArea className="h-[400px]">
                 {topCharacters.length > 0 ? (
                   <ul>
                     {topCharacters.map((char, index) => (
-                      <li key={index} className="mb-2">
-                        <span className="font-bold">{char.key}</span> - Level{" "}
-                        {char.level}, Constellation {char.constellation}
+                      <li
+                        key={index}
+                        className="mb-4 flex items-center space-x-4"
+                      >
+                        <Image
+                          src={`/character-portraits/${formatCharacterIconFilename(
+                            char.key
+                          )}`}
+                          alt={char.key}
+                          width={50}
+                          height={50}
+                          className=""
+                          onError={(e) => {
+                            e.currentTarget.src = "/placeholder.svg";
+                          }}
+                        />
+                        <div>
+                          <span className="font-bold">{char.key}</span>
+                          <p className="text-sm text-gray-500">
+                            Level {char.level}, Constellation{" "}
+                            {char.constellation}
+                          </p>
+                        </div>
                       </li>
                     ))}
                   </ul>
