@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 interface GenshinData {
   characters: Array<{ key: string; level: number; constellation: number }>;
@@ -31,13 +33,13 @@ function formatCharacterIconFilename(characterKey: string): string {
     "ayaka": "Kamisato_Ayaka",
   };
 
-  // Check if the character has more than 1 name
+  // Check if the character has name with space
   const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, '');
   if (lowerCaseKey in specialNames) {
     return `${specialNames[lowerCaseKey]}_Icon.png`;
   }
 
-  // For characters without special names, use the original key
+  // For characters without spaced names, use the original key
   return `${characterKey}_Icon.png`;
 }
 
@@ -69,6 +71,11 @@ export default function Genshin({ data }: GenshinProps) {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{characterCount}</p>
+            <div className="mt-4">
+              <Button asChild>
+                <Link href="/characters">View All Characters</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
         <Card>

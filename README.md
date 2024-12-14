@@ -11,3 +11,5 @@ Using Vercel to host the website for now: https://gachasavior.vercel.app/
 //npm install firebase
 
 Using shadcn/ui component library with Lucide React Icons
+Genshin Impact Character Portraits via https://genshin-impact.fandom.com/wiki/Character/Gallery
+All characters belong to Hoyoverse
