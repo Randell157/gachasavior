@@ -28,13 +28,15 @@ interface GenshinProps {
 function formatCharacterIconFilename(characterKey: string): string {
   // List of characters with special naming conventions
   const specialNames: { [key: string]: string } = {
-    "kazuha": "Kaedehara_Kazuha",
-    "hutao": "Hu_Tao",
-    "ayaka": "Kamisato_Ayaka",
+    kazuha: "Kaedehara_Kazuha",
+    hutao: "Hu_Tao",
+    ayaka: "Kamisato_Ayaka",
+    raidenshogun: "Raiden_Shogun",
+    yaemiko: "Yae_Miko",
   };
 
   // Check if the character has name with space
-  const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, '');
+  const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, "");
   if (lowerCaseKey in specialNames) {
     return `${specialNames[lowerCaseKey]}_Icon.png`;
   }
@@ -85,6 +87,11 @@ export default function Genshin({ data }: GenshinProps) {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{weaponCount}</p>
+            <div className="mt-4">
+              <Button asChild>
+                <Link href="/weapons">View All Weapons</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -94,6 +101,11 @@ export default function Genshin({ data }: GenshinProps) {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{artifactCount}</p>
+            <div className="mt-4">
+              <Button asChild>
+                <Link href="/artifacts">View All Artifacts</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
