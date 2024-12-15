@@ -12,10 +12,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Artifact {
   key: string;
+  setKey: string;
+  name?: string;
   level?: number;
   rarity?: number;
   set?: string;
-  type?: string;
+  slotKey?: string; // Artifact type (flower, plume, etc.)
   mainStatKey?: string;
   mainStatValue?: number;
   location?: string;
@@ -27,14 +29,17 @@ interface GenshinData {
   artifacts: Artifact[];
 }
 
-function formatArtifactName(name: string): string {
-  if (name.toLowerCase() === "unknownartifact") {
-    return "Unknown Artifact";
+function formatArtifactName(artifact: Artifact): string {
+  if (artifact.setKey) {
+    return artifact.setKey
+      .split(/(?=[A-Z])/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   }
-  return name
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  if (artifact.set && artifact.slotKey) {
+    return `${artifact.set} ${artifact.slotKey}`;
+  }
+  return "Unknown Artifact";
 }
 
 export default function ArtifactsPage() {
@@ -72,14 +77,14 @@ export default function ArtifactsPage() {
                   <div className="relative w-12 h-12">
                     <Image
                       src={
-                        artifact.set
-                          ? `/artifact-icons/${artifact.set.replace(
+                        artifact.setKey
+                          ? `/artifact-icons/${artifact.setKey.replace(
                               /\s+/g,
                               "_"
                             )}.png`
                           : "/placeholder.svg"
                       }
-                      alt={formatArtifactName(artifact.key)}
+                      alt={formatArtifactName(artifact)}
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
@@ -88,7 +93,7 @@ export default function ArtifactsPage() {
                       }}
                     />
                   </div>
-                  <span>{formatArtifactName(artifact.key)}</span>
+                  <span>{formatArtifactName(artifact)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -99,15 +104,13 @@ export default function ArtifactsPage() {
                   {artifact.rarity !== undefined && (
                     <p>Rarity: {artifact.rarity}★</p>
                   )}
-                  {artifact.set && (
-                    <p>Set: {formatArtifactName(artifact.set)}</p>
+                  {artifact.setKey && (
+                    <p>Set: {formatArtifactName(artifact)}</p>
                   )}
-                  {artifact.type && (
-                    <p>Type: {formatArtifactName(artifact.type)}</p>
-                  )}
+                  {artifact.slotKey && <p>Type: {artifact.slotKey}</p>}
                   {artifact.mainStatKey && (
                     <p>
-                      Main Stat: {formatArtifactName(artifact.mainStatKey)} -{" "}
+                      Main Stat: {artifact.mainStatKey} -{" "}
                       {artifact.mainStatValue}
                     </p>
                   )}
@@ -121,7 +124,7 @@ export default function ArtifactsPage() {
                       <ul className="list-disc pl-5">
                         {artifact.substats.map((substat, subIndex) => (
                           <li key={subIndex}>
-                            {formatArtifactName(substat.key)}: {substat.value}
+                            {substat.key}: {substat.value}
                           </li>
                         ))}
                       </ul>
@@ -130,7 +133,7 @@ export default function ArtifactsPage() {
                   {!artifact.level &&
                     !artifact.rarity &&
                     !artifact.set &&
-                    !artifact.type && (
+                    !artifact.slotKey && (
                       <p>
                         No detailed information available for this artifact.
                       </p>
