@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Artifact {
   key: string;
@@ -15,10 +16,25 @@ interface Artifact {
   rarity?: number;
   set?: string;
   type?: string;
+  mainStatKey?: string;
+  mainStatValue?: number;
+  location?: string;
+  lock?: boolean;
+  substats?: Array<{ key: string; value: number }>;
 }
 
 interface GenshinData {
   artifacts: Artifact[];
+}
+
+function formatArtifactName(name: string): string {
+  if (name.toLowerCase() === "unknownartifact") {
+    return "Unknown Artifact";
+  }
+  return name
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export default function ArtifactsPage() {
@@ -63,7 +79,7 @@ export default function ArtifactsPage() {
                             )}.png`
                           : "/placeholder.svg"
                       }
-                      alt={artifact.set || "Unknown Artifact"}
+                      alt={formatArtifactName(artifact.key)}
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
@@ -72,22 +88,54 @@ export default function ArtifactsPage() {
                       }}
                     />
                   </div>
-                  <span>{artifact.key}</span>
+                  <span>{formatArtifactName(artifact.key)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {artifact.level !== undefined && <p>Level: {artifact.level}</p>}
-                {artifact.rarity !== undefined && (
-                  <p>Rarity: {artifact.rarity}★</p>
-                )}
-                {artifact.set && <p>Set: {artifact.set}</p>}
-                {artifact.type && <p>Type: {artifact.type}</p>}
-                {!artifact.level &&
-                  !artifact.rarity &&
-                  !artifact.set &&
-                  !artifact.type && (
-                    <p>No detailed information available for this artifact.</p>
+                <ScrollArea className="h-[200px]">
+                  {artifact.level !== undefined && (
+                    <p>Level: {artifact.level}</p>
                   )}
+                  {artifact.rarity !== undefined && (
+                    <p>Rarity: {artifact.rarity}★</p>
+                  )}
+                  {artifact.set && (
+                    <p>Set: {formatArtifactName(artifact.set)}</p>
+                  )}
+                  {artifact.type && (
+                    <p>Type: {formatArtifactName(artifact.type)}</p>
+                  )}
+                  {artifact.mainStatKey && (
+                    <p>
+                      Main Stat: {formatArtifactName(artifact.mainStatKey)} -{" "}
+                      {artifact.mainStatValue}
+                    </p>
+                  )}
+                  {artifact.location && <p>Equipped by: {artifact.location}</p>}
+                  {artifact.lock !== undefined && (
+                    <p>Locked: {artifact.lock ? "Yes" : "No"}</p>
+                  )}
+                  {artifact.substats && artifact.substats.length > 0 && (
+                    <>
+                      <p className="font-semibold mt-2">Substats:</p>
+                      <ul className="list-disc pl-5">
+                        {artifact.substats.map((substat, subIndex) => (
+                          <li key={subIndex}>
+                            {formatArtifactName(substat.key)}: {substat.value}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {!artifact.level &&
+                    !artifact.rarity &&
+                    !artifact.set &&
+                    !artifact.type && (
+                      <p>
+                        No detailed information available for this artifact.
+                      </p>
+                    )}
+                </ScrollArea>
               </CardContent>
             </Card>
           ))}
