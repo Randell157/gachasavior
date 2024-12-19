@@ -10,11 +10,42 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+interface GenshinData {
+  characters: Array<{
+    key: string;
+    level: number;
+    constellation: number;
+    weapon?: {
+      key: string;
+      level: number;
+      refinement: number;
+    };
+    artifacts?: Array<{
+      setKey: string;
+      slotKey: string;
+      level: number;
+      rarity: number;
+    }>;
+  }>;
+  weapons: Array<{
+    key: string;
+    level: number;
+    refinement: number;
+  }>;
+  artifacts: Array<{
+    setKey: string;
+    slotKey: string;
+    level: number;
+    rarity: number;
+  }>;
+  materials: Record<string, number>;
+}
+
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const { user, username, loading, error } = useAuth();
   const router = useRouter();
-  const [genshinData, setGenshinData] = useState(null);
+  const [genshinData, setGenshinData] = useState<GenshinData | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -47,11 +78,15 @@ export default function DashboardPage() {
         try {
           const json = JSON.parse(e.target?.result as string);
           setGenshinData(json);
-          // Save to localStorage
-          localStorage.setItem(`genshinData_${user?.uid}`, JSON.stringify(json));
+          localStorage.setItem(
+            `genshinData_${user?.uid}`,
+            JSON.stringify(json)
+          );
         } catch (error) {
           console.error("Error parsing JSON:", error);
-          alert("Error parsing JSON file. Please make sure it's a valid Genshin Impact data file.");
+          alert(
+            "Error parsing JSON file. Please make sure it's a valid Genshin Impact data file."
+          );
         }
       };
       reader.readAsText(file);
@@ -90,16 +125,6 @@ export default function DashboardPage() {
                     onChange={handleFileUpload}
                     className="mb-4"
                   />
-                  {/* {genshinData && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Imported Genshin Impact Data:
-                      </h3>
-                      <pre className="bg-gray-100 p-4 rounded-md overflow-auto max-h-60">
-                        {JSON.stringify(genshinData, null, 2)}
-                      </pre>
-                    </div>
-                  )} */}
                 </div>
               </div>
               <Genshin data={genshinData} />

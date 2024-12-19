@@ -14,10 +14,33 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
+interface Weapon {
+  key: string;
+  level: number;
+  refinement: number;
+  location?: string;
+}
+
+interface Artifact {
+  setKey: string;
+  slotKey: string;
+  level: number;
+  rarity: number;
+  location?: string;
+}
+
+interface Character {
+  key: string;
+  level: number;
+  constellation: number;
+  weapon?: Weapon;
+  artifacts?: Artifact[];
+}
+
 interface GenshinData {
-  characters: Array<{ key: string; level: number; constellation: number }>;
-  weapons: Array<{ key: string; level: number; refinement: number }>;
-  artifacts: Array<any>;
+  characters: Character[];
+  weapons: Weapon[];
+  artifacts: Artifact[];
   materials: Record<string, number>;
 }
 
@@ -26,23 +49,30 @@ interface GenshinProps {
 }
 
 function formatCharacterIconFilename(characterKey: string): string {
-  // List of characters with special naming conventions
   const specialNames: { [key: string]: string } = {
-    kazuha: "Kaedehara_Kazuha",
+    kaedeharakazuha: "Kaedehara_Kazuha",
     hutao: "Hu_Tao",
     ayaka: "Kamisato_Ayaka",
     raidenshogun: "Raiden_Shogun",
     yaemiko: "Yae_Miko",
+    yunjin: "Yun_Jin",
+    kukishinobu: "Kuki_Shinobu",
+    kujousara: "Kujou_Sara",
+    shikanoinheizou: "Shikanoin_Heizou",
   };
 
-  // Check if the character has name with space
   const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, "");
+
+  if (lowerCaseKey.startsWith("traveler")) {
+    return "Aether_Icon.png";
+  }
+
   if (lowerCaseKey in specialNames) {
     return `${specialNames[lowerCaseKey]}_Icon.png`;
   }
 
-  // For characters without spaced names, use the original key
-  return `${characterKey}_Icon.png`;
+  const formattedKey = characterKey.replace(/\s+/g, "_");
+  return `${formattedKey}_Icon.png`;
 }
 
 export default function Genshin({ data }: GenshinProps) {
@@ -56,9 +86,37 @@ export default function Genshin({ data }: GenshinProps) {
   const weaponCount = data.weapons.length;
   const artifactCount = data.artifacts.length;
 
+  //Mapping characters with their equipment
+  const characterEquipment: {
+    [key: string]: { weapon?: Weapon; artifacts?: Artifact[] };
+  } = {};
+  data.characters.forEach((char) => {
+    characterEquipment[char.key] = { weapon: undefined, artifacts: [] };
+  });
+
+  data.weapons.forEach((weapon) => {
+    if (weapon.location && characterEquipment[weapon.location]) {
+      characterEquipment[weapon.location].weapon = weapon;
+    }
+  });
+
+  data.artifacts.forEach((artifact) => {
+    if (artifact.location && characterEquipment[artifact.location]) {
+      if (!characterEquipment[artifact.location].artifacts) {
+        characterEquipment[artifact.location].artifacts = [];
+      }
+      characterEquipment[artifact.location].artifacts!.push(artifact);
+    }
+  });
+
   const topCharacters = data.characters
     .sort((a, b) => b.level - a.level)
-    .slice(0, 5);
+    .slice(0, 5)
+    .map((char) => ({
+      ...char,
+      weapon: characterEquipment[char.key]?.weapon,
+      artifacts: characterEquipment[char.key]?.artifacts,
+    }));
 
   const topWeapons = data.weapons.sort((a, b) => b.level - a.level).slice(0, 5);
 
@@ -120,7 +178,9 @@ export default function Genshin({ data }: GenshinProps) {
           <Card>
             <CardHeader>
               <CardTitle>Top Characters</CardTitle>
-              <CardDescription>Highest level characters</CardDescription>
+              <CardDescription>
+                Highest level characters with their equipment
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px]">
@@ -129,27 +189,62 @@ export default function Genshin({ data }: GenshinProps) {
                     {topCharacters.map((char, index) => (
                       <li
                         key={index}
-                        className="mb-4 flex items-center space-x-4"
+                        className="mb-6 pb-4 border-b border-gray-200 last:border-b-0"
                       >
-                        <Image
-                          src={`/character-portraits/${formatCharacterIconFilename(
-                            char.key
-                          )}`}
-                          alt={char.key}
-                          width={50}
-                          height={50}
-                          className=""
-                          onError={(e) => {
-                            e.currentTarget.src = "/placeholder.svg";
-                          }}
-                        />
-                        <div>
-                          <span className="font-bold">{char.key}</span>
-                          <p className="text-sm text-gray-500">
-                            Level {char.level}, Constellation{" "}
-                            {char.constellation}
-                          </p>
+                        <div className="flex items-center space-x-4 mb-2">
+                          <Image
+                            src={`/character-portraits/${formatCharacterIconFilename(
+                              char.key
+                            )}`}
+                            alt={char.key}
+                            width={50}
+                            height={50}
+                            className=""
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg";
+                            }}
+                          />
+                          <div>
+                            <span className="font-bold text-lg">
+                              {char.key}
+                            </span>
+                            <p className="text-sm text-gray-500">
+                              Level {char.level}, Constellation{" "}
+                              {char.constellation}
+                            </p>
+                          </div>
                         </div>
+                        {char.weapon && (
+                          <div className="ml-14 mb-2">
+                            <p className="text-sm">
+                              <span className="font-semibold">Weapon:</span>{" "}
+                              {char.weapon.key} (Lv. {char.weapon.level}, R
+                              {char.weapon.refinement})
+                            </p>
+                          </div>
+                        )}
+                        {char.artifacts && char.artifacts.length > 0 ? (
+                          <div className="ml-14">
+                            <p className="text-sm font-semibold mb-1">
+                              Artifacts:
+                            </p>
+                            <ul className="list-disc list-inside">
+                              {char.artifacts.map((artifact, artifactIndex) => (
+                                <li
+                                  key={artifactIndex}
+                                  className="text-sm ml-4"
+                                >
+                                  {artifact.setKey} {artifact.slotKey} (Lv.{" "}
+                                  {artifact.level}, {artifact.rarity}★)
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : (
+                          <p className="ml-14 text-sm">
+                            No artifacts equipped.
+                          </p>
+                        )}
                       </li>
                     ))}
                   </ul>

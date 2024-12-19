@@ -112,7 +112,7 @@ export default function CharactersPage() {
                       alt={character.key}
                       layout="fill"
                       objectFit="cover"
-                      className="rounded-full"
+                      className=""
                       onError={(e) => {
                         console.error(
                           `Failed to load image for ${
