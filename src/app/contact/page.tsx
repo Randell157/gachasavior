@@ -11,9 +11,7 @@ export default function ContactPage() {
         <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100">
           <header className="bg-white shadow">
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-indigo-900">
-                Contact Me
-              </h1>
+              <h1 className="text-3xl font-bold text-indigo-900">Contact Me</h1>
             </div>
           </header>
           <main className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
@@ -24,7 +22,8 @@ export default function ContactPage() {
                     Want to improve the website?
                   </h2>
                   <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                    Here's where you can contact me. Use the contact form or email
+                    Here's where you can contact me. Use the contact form or
+                    email
                   </p>
                 </div>
               </div>
@@ -36,21 +35,24 @@ export default function ContactPage() {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       <p className="mb-4">
-                        Please click the button below to access our contact form. We'll get back to you as soon as possible!
+                        Please click the button below to access our contact
+                        form. We'll get back to you as soon as possible!
                       </p>
                       <Button asChild className="w-full sm:w-auto">
-                        <a href={googleFormsUrl} target="_blank" rel="noopener noreferrer">
+                        <a
+                          href={googleFormsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Open Contact Form
                         </a>
                       </Button>
                     </dd>
                   </div>
                   <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Email
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500">Email</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      gachasavior@gmail.com
+                      gachasaviorapp@gmail.com
                     </dd>
                   </div>
                 </dl>
