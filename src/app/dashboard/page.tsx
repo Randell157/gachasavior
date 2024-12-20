@@ -9,6 +9,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface GenshinData {
   characters: Array<{
@@ -43,15 +45,21 @@ interface GenshinData {
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
-  const { user, username, loading, error } = useAuth();
+  const { user, username, loading, error: authError } = useAuth();
   const router = useRouter();
   const [genshinData, setGenshinData] = useState<GenshinData | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
     const savedData = localStorage.getItem(`genshinData_${user?.uid}`);
     if (savedData) {
-      setGenshinData(JSON.parse(savedData));
+      try {
+        setGenshinData(JSON.parse(savedData));
+      } catch (error) {
+        console.error("Error parsing saved data:", error);
+        setFileError("Error loading saved data. Please upload a new file.");
+      }
     }
   }, [user]);
 
@@ -77,30 +85,53 @@ export default function DashboardPage() {
       reader.onload = (e) => {
         try {
           const json = JSON.parse(e.target?.result as string);
-          setGenshinData(json);
-          localStorage.setItem(
-            `genshinData_${user?.uid}`,
-            JSON.stringify(json)
-          );
+          if (validateGenshinData(json)) {
+            setGenshinData(json);
+            localStorage.setItem(
+              `genshinData_${user?.uid}`,
+              JSON.stringify(json)
+            );
+            setFileError(null);
+          } else {
+            throw new Error("Invalid Genshin Impact data structure");
+          }
         } catch (error) {
           console.error("Error parsing JSON:", error);
-          alert(
-            "Error parsing JSON file. Please make sure it's a valid Genshin Impact data file."
+          setFileError(
+            "Error importing JSON file. Please make sure it's a valid Genshin Impact data file."
           );
+          setGenshinData(null);
         }
       };
       reader.readAsText(file);
     }
   };
 
+  const validateGenshinData = (data: any): data is GenshinData => {
+    return (
+      data &&
+      Array.isArray(data.characters) &&
+      Array.isArray(data.weapons) &&
+      Array.isArray(data.artifacts) &&
+      typeof data.materials === "object"
+    );
+  };
+
+  const handleInvalidData = () => {
+    setGenshinData(null);
+    setFileError(
+      "Invalid Genshin Impact data structure. Please upload a valid file."
+    );
+  };
+
   if (!isClient || loading) {
     return null;
   }
 
-  if (error) {
+  if (authError) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
-        {error}
+        {authError}
       </div>
     );
   }
@@ -126,8 +157,20 @@ export default function DashboardPage() {
                     className="mb-4"
                   />
                 </div>
+                {fileError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{fileError}</AlertDescription>
+                  </Alert>
+                )}
               </div>
-              <Genshin data={genshinData} />
+              {genshinData && (
+                <Genshin
+                  initialData={genshinData}
+                  onInvalidData={handleInvalidData}
+                />
+              )}
               <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
                 <Button onClick={handleLogout} variant="destructive">
                   Logout

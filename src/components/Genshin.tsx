@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -13,6 +13,8 @@ import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from 'lucide-react';
 
 interface Weapon {
   key: string;
@@ -45,7 +47,8 @@ interface GenshinData {
 }
 
 interface GenshinProps {
-  data: GenshinData | null;
+  initialData: GenshinData | null;
+  onInvalidData: () => void;
 }
 
 function formatCharacterIconFilename(characterKey: string): string {
@@ -75,8 +78,43 @@ function formatCharacterIconFilename(characterKey: string): string {
   return `${formattedKey}_Icon.png`;
 }
 
-export default function Genshin({ data }: GenshinProps) {
+export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
+  const [data, setData] = useState<GenshinData | null>(initialData);
   const [activeTab, setActiveTab] = useState("characters");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      validateData(initialData);
+    }
+  }, [initialData]);
+
+  const validateData = (data: GenshinData | null) => {
+    if (!data) {
+      setError("No data provided. Please upload a JSON file.");
+      onInvalidData();
+      return;
+    }
+
+    if (!Array.isArray(data.characters) || !Array.isArray(data.weapons) || !Array.isArray(data.artifacts) || typeof data.materials !== 'object') {
+      setError("Invalid JSON structure. Please check your file and try again.");
+      onInvalidData();
+      return;
+    }
+
+    setData(data);
+    setError(null);
+  };
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
 
   if (!data) {
     return <p>Please upload a valid JSON file</p>;
@@ -86,21 +124,19 @@ export default function Genshin({ data }: GenshinProps) {
   const weaponCount = data.weapons.length;
   const artifactCount = data.artifacts.length;
 
-  //Mapping characters with their equipment
-  const characterEquipment: {
-    [key: string]: { weapon?: Weapon; artifacts?: Artifact[] };
-  } = {};
-  data.characters.forEach((char) => {
+  // Create a map of characters to their equipped items
+  const characterEquipment: { [key: string]: { weapon?: Weapon; artifacts?: Artifact[] } } = {};
+  data.characters.forEach(char => {
     characterEquipment[char.key] = { weapon: undefined, artifacts: [] };
   });
 
-  data.weapons.forEach((weapon) => {
+  data.weapons.forEach(weapon => {
     if (weapon.location && characterEquipment[weapon.location]) {
       characterEquipment[weapon.location].weapon = weapon;
     }
   });
 
-  data.artifacts.forEach((artifact) => {
+  data.artifacts.forEach(artifact => {
     if (artifact.location && characterEquipment[artifact.location]) {
       if (!characterEquipment[artifact.location].artifacts) {
         characterEquipment[artifact.location].artifacts = [];
@@ -112,13 +148,15 @@ export default function Genshin({ data }: GenshinProps) {
   const topCharacters = data.characters
     .sort((a, b) => b.level - a.level)
     .slice(0, 5)
-    .map((char) => ({
+    .map(char => ({
       ...char,
       weapon: characterEquipment[char.key]?.weapon,
       artifacts: characterEquipment[char.key]?.artifacts,
     }));
 
   const topWeapons = data.weapons.sort((a, b) => b.level - a.level).slice(0, 5);
+
+
 
   return (
     <div className="container mx-auto p-4">
