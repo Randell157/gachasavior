@@ -1,42 +1,46 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const features = [
   {
     title: "Character Overview",
-    description: "View and manage your Genshin Impact characters",
+    description: "View your Genshin Impact characters",
     details: [
       "Display total number of owned characters",
-      "List top characters by level",
-      "Show character constellations",
+      "List top 5 characters by level",
+      "Show character equipped weapons and artifacts",
     ],
   },
   {
-    title: "Weapon Management",
-    description: "Keep track of your weapons",
+    title: "Weapons Overview",
+    description: "Keep track of your weapons obtained",
     details: [
-      "View total number of weapons in inventory",
-      "List top weapons by level",
+      "Display total number of weapons in inventory",
+      "List top 5 weapons by level",
       "Display weapon refinement levels",
     ],
   },
   {
-    title: "Artifact Inventory",
-    description: "Organize and analyze your artifact collection",
-    details: [
-      "Show total number of owned artifacts",
-    ],
+    title: "Artifacts",
+    description: "Organize and analyze your artifacts",
+    details: ["Show total number of owned artifacts"],
   },
   {
-    title: "Material Tracking",
-    description: "Monitor your materials and resources",
+    title: "Materials",
+    description: "Display your materials and resources collected",
     details: [
       "Display total count of materials",
       "List top materials by quantity",
     ],
   },
-]
+];
 
 export default function Features() {
   return (
@@ -52,7 +56,9 @@ export default function Features() {
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
             <div className="py-4 sm:py-5 sm:px-6">
-              <h3 className="text-lg font-medium text-gray-900">Genshin Impact Dashboard Features</h3>
+              <h3 className="text-lg font-medium text-gray-900">
+                Genshin Impact Dashboard Features
+              </h3>
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
                 {features.map((feature, index) => (
                   <Card key={index}>
@@ -74,7 +80,9 @@ export default function Features() {
               </div>
             </div>
             <div className="py-4 sm:py-5 sm:px-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Dashboard Preview Sample</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Dashboard Preview Sample
+              </h3>
               <Card className="w-full max-w-3xl mx-auto">
                 <CardContent className="p-6">
                   <Tabs defaultValue="characters" className="w-full">
@@ -87,11 +95,23 @@ export default function Features() {
                       <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                         <h4 className="font-semibold mb-2">Top Characters</h4>
                         <ul className="space-y-2">
-                          <li>Ganyu - Level 90, Constellation 2</li>
-                          <li>Diluc - Level 88, Constellation 1</li>
-                          <li>Venti - Level 85, Constellation 0</li>
-                          <li>Keqing - Level 82, Constellation 3</li>
-                          <li>Zhongli - Level 80, Constellation 0</li>
+                          <li>
+                            Ganyu - Level 90, Constellation 2 Weapon: Artifacts:
+                          </li>
+                          <li>
+                            Diluc - Level 88, Constellation 1 Weapon: Artifacts:
+                          </li>
+                          <li>
+                            Venti - Level 85, Constellation 0 Weapon: Artifacts:
+                          </li>
+                          <li>
+                            Keqing - Level 82, Constellation 3 Weapon:
+                            Artifacts:
+                          </li>
+                          <li>
+                            Zhongli - Level 80, Constellation 0 Weapon:
+                            Artifacts:
+                          </li>
                         </ul>
                       </ScrollArea>
                     </TabsContent>
@@ -101,9 +121,15 @@ export default function Features() {
                         <ul className="space-y-2">
                           <li>Wolf's Gravestone - Level 90, Refinement 1</li>
                           <li>Skyward Harp - Level 90, Refinement 2</li>
-                          <li>Primordial Jade Winged-Spear - Level 85, Refinement 1</li>
+                          <li>
+                            Primordial Jade Winged-Spear - Level 85, Refinement
+                            1
+                          </li>
                           <li>Aquila Favonia - Level 80, Refinement 1</li>
-                          <li>Lost Prayer to the Sacred Winds - Level 80, Refinement 1</li>
+                          <li>
+                            Lost Prayer to the Sacred Winds - Level 80,
+                            Refinement 1
+                          </li>
                         </ul>
                       </ScrollArea>
                     </TabsContent>
