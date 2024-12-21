@@ -9,6 +9,7 @@ Using Vercel to host the website for now: https://gachasavior.vercel.app/
 //For Dev: npm run dev
 //Dependencies:
 //npm install firebase
+//Sample JSON file provided on src/public
 
 Using shadcn/ui component library with Lucide React Icons
 
