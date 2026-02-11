@@ -80,14 +80,16 @@ export default function LoginPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50">
-          <div className="w-full max-w-md space-y-8">
-            <div>
-              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Enter Login Information
-              </h2>
-            </div>
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+          <div className="w-full max-w-md">
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <header className="bg-white shadow sm:shadow-none px-6 py-6">
+                <h1 className="text-2xl font-bold text-indigo-900 text-center">
+                  Enter Login Information
+                </h1>
+              </header>
+              <div className="px-6 pb-6 space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-md shadow-sm -space-y-px">
                 <div>
                   <label htmlFor="email" className="sr-only">
@@ -135,7 +137,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </form>
-            <div className="text-sm text-center">
+            <div className="text-sm text-center pt-2">
               Don&apos;t have an account?{" "}
               <Link
                 href="/create-account"
@@ -143,6 +145,8 @@ export default function LoginPage() {
               >
                 Create one here
               </Link>
+            </div>
+              </div>
             </div>
           </div>
         </div>

@@ -156,26 +156,31 @@ export default function CharactersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">All Characters</h1>
-          <div className="flex items-center space-x-2">
-            <label htmlFor="sort-order" className="text-sm font-medium">Sort by:</label>
-            <select
-              id="sort-order"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="bg-white border border-gray-300 rounded-md shadow-sm p-2 text-sm"
-            >
-              <option value="level-desc">Level (High to Low)</option>
-              <option value="level-asc">Level (Low to High)</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="constellation-desc">Constellation (High to Low)</option>
-              <option value="constellation-asc">Constellation (Low to High)</option>
-            </select>
-          </div>
-        </div>
+      <main className="flex-1">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100">
+          <header className="bg-white shadow">
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center flex-wrap gap-4">
+              <h1 className="text-3xl font-bold text-indigo-900">All Characters</h1>
+              <div className="flex items-center space-x-2">
+                <label htmlFor="sort-order" className="text-sm font-medium">Sort by:</label>
+                <select
+                  id="sort-order"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="bg-white border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+                >
+                  <option value="level-desc">Level (High to Low)</option>
+                  <option value="level-asc">Level (Low to High)</option>
+                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="name-desc">Name (Z-A)</option>
+                  <option value="constellation-desc">Constellation (High to Low)</option>
+                  <option value="constellation-asc">Constellation (Low to High)</option>
+                </select>
+              </div>
+            </div>
+          </header>
+          <div className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCharacters.map((character, index) => (
             <Card key={index}>
@@ -238,6 +243,9 @@ export default function CharactersPage() {
           <Button asChild>
             <Link href="/dashboard">Back to Dashboard</Link>
           </Button>
+        </div>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />

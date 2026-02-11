@@ -68,10 +68,10 @@ const features = [
 export default function Features() {
   return (
     <>
-      {/* Feature list section */}
-        <div className="bg-gradient-to-b from-indigo-100 to-purple-100 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-indigo-900 mb-6">
+      <div className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+          <div className="px-4 py-5 sm:px-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Genshin Impact Dashboard Features
             </h2>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
@@ -97,12 +97,12 @@ export default function Features() {
         </div>
 
         {/* Dashboard preview — matches logged-in dashboard layout */}
-        <div className="bg-gray-100 py-12">
+        <div className="py-4">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 className="text-lg font-medium text-gray-900 mb-8">
               Dashboard Preview Sample
             </h3>
-            <div className="bg-white shadow-lg rounded-3xl p-6 sm:p-8 lg:p-10">
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6 sm:p-8 lg:p-10">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Genshin Impact</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <Card>
@@ -247,6 +247,7 @@ export default function Features() {
             </div>
           </div>
         </div>
+      </div>
     </>
   );
 }

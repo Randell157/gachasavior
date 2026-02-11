@@ -136,8 +136,16 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-          <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100">
+          <header className="bg-white shadow">
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+              <h1 className="text-3xl font-bold text-indigo-900">
+                Dashboard
+              </h1>
+            </div>
+          </header>
+          <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg px-4 py-8 sm:p-8 lg:p-10">
             <p className="text-xl text-gray-700 sm:text-lg mb-6">
               Hello, {username || "User"}!
             </p>
@@ -170,6 +178,7 @@ export default function DashboardPage() {
                 </Alert>
               )}
             </div>
+          </div>
           </div>
         </div>
       </main>

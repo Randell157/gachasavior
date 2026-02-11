@@ -30,7 +30,10 @@ export default function Header() {
   return (
     <header className="px-4 lg:px-6 h-14 flex items-center justify-center">
       <div className="container flex items-center justify-between">
-        <Link className="flex items-center justify-center" href="/dashboard">
+        <Link
+          className="flex items-center justify-center"
+          href={user ? "/dashboard" : "/"}
+        >
           <span className="font-bold">Gacha Savior</span>
         </Link>
         <nav className="flex items-center gap-4 sm:gap-6">
