@@ -40,10 +40,14 @@ interface Character {
 }
 
 interface GenshinData {
-  characters: Character[];
-  weapons: Weapon[];
-  artifacts: Artifact[];
-  materials: Record<string, number>;
+  format?: string;
+  version?: number;
+  kamera_version?: string;
+  source?: string;
+  characters?: Character[];
+  weapons?: Weapon[];
+  artifacts?: Artifact[];
+  materials?: Record<string, number>;
 }
 
 interface GenshinProps {
@@ -96,8 +100,14 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
       return;
     }
 
-    if (!Array.isArray(data.characters) || !Array.isArray(data.weapons) || !Array.isArray(data.artifacts) || typeof data.materials !== 'object') {
-      setError("Invalid JSON structure. Please check your file and try again.");
+    // Check if at least one of the data properties exists
+    if (
+      !data.characters &&
+      !data.weapons &&
+      !data.artifacts &&
+      !data.materials
+    ) {
+      setError("Invalid JSON structure. No valid data found in file.");
       onInvalidData();
       return;
     }
@@ -120,23 +130,23 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
     return <p>Please upload a valid JSON file</p>;
   }
 
-  const characterCount = data.characters.length;
-  const weaponCount = data.weapons.length;
-  const artifactCount = data.artifacts.length;
+  const characterCount = data.characters?.length ?? 0;
+  const weaponCount = data.weapons?.length ?? 0;
+  const artifactCount = data.artifacts?.length ?? 0;
 
   // Create a map of characters to their equipped items
   const characterEquipment: { [key: string]: { weapon?: Weapon; artifacts?: Artifact[] } } = {};
-  data.characters.forEach(char => {
+  (data.characters ?? []).forEach(char => {
     characterEquipment[char.key] = { weapon: undefined, artifacts: [] };
   });
 
-  data.weapons.forEach(weapon => {
+  (data.weapons ?? []).forEach(weapon => {
     if (weapon.location && characterEquipment[weapon.location]) {
       characterEquipment[weapon.location].weapon = weapon;
     }
   });
 
-  data.artifacts.forEach(artifact => {
+  (data.artifacts ?? []).forEach(artifact => {
     if (artifact.location && characterEquipment[artifact.location]) {
       if (!characterEquipment[artifact.location].artifacts) {
         characterEquipment[artifact.location].artifacts = [];
@@ -145,7 +155,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
     }
   });
 
-  const topCharacters = data.characters
+  const topCharacters = (data.characters ?? [])
     .sort((a, b) => b.level - a.level)
     .slice(0, 5)
     .map(char => ({
@@ -154,7 +164,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
       artifacts: characterEquipment[char.key]?.artifacts,
     }));
 
-  const topWeapons = data.weapons.sort((a, b) => b.level - a.level).slice(0, 5);
+  const topWeapons = (data.weapons ?? []).sort((a, b) => b.level - a.level).slice(0, 5);
 
 
 
@@ -239,6 +249,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
                             height={50}
                             className=""
                             onError={(e) => {
+                              e.currentTarget.onerror = null;
                               e.currentTarget.src = "/placeholder.svg";
                             }}
                           />
@@ -325,7 +336,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px]">
-                {Object.keys(data.materials).length > 0 ? (
+                {data.materials && Object.keys(data.materials).length > 0 ? (
                   <ul>
                     {Object.entries(data.materials)
                       .sort(([, a], [, b]) => b - a)

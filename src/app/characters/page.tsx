@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,7 +31,9 @@ interface Character {
 }
 
 interface GenshinData {
-  characters: Character[];
+  characters?: Character[];
+  weapons?: Weapon[];
+  artifacts?: Artifact[];
 }
 
 function formatArtifactName(artifact: Artifact): string {
@@ -74,6 +76,8 @@ function formatCharacterIconFilename(characterKey: string): string {
 
 export default function CharactersPage() {
   const [genshinData, setGenshinData] = useState<GenshinData | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [sortOrder, setSortOrder] = useState("level-desc");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -88,7 +92,58 @@ export default function CharactersPage() {
         }
       }
     }
-  }, [user]);
+  }, [user?.uid]);
+
+  const handleImageError = (characterKey: string) => {
+    setImageErrors((prev) => new Set(prev).add(characterKey));
+  };
+
+  const sortedCharacters = useMemo(() => {
+    if (!genshinData?.characters) return [];
+
+    const characterEquipment: { [key: string]: { weapon?: Weapon; artifacts: Artifact[] } } = {};
+
+    (genshinData.characters ?? []).forEach(char => {
+      characterEquipment[char.key] = { artifacts: [] };
+    });
+
+    (genshinData.weapons ?? []).forEach(weapon => {
+      if (weapon.location && characterEquipment[weapon.location]) {
+        characterEquipment[weapon.location].weapon = weapon;
+      }
+    });
+
+    (genshinData.artifacts ?? []).forEach(artifact => {
+      if (artifact.location && characterEquipment[artifact.location]) {
+        characterEquipment[artifact.location].artifacts.push(artifact);
+      }
+    });
+
+    const charactersWithEquipment = (genshinData.characters ?? []).map(char => ({
+      ...char,
+      weapon: characterEquipment[char.key]?.weapon,
+      artifacts: characterEquipment[char.key]?.artifacts,
+    }));
+
+    const charactersCopy = [...charactersWithEquipment];
+
+    switch (sortOrder) {
+      case "name-asc":
+        return charactersCopy.sort((a, b) => a.key.localeCompare(b.key));
+      case "name-desc":
+        return charactersCopy.sort((a, b) => b.key.localeCompare(a.key));
+      case "level-asc":
+        return charactersCopy.sort((a, b) => a.level - b.level);
+      case "level-desc":
+        return charactersCopy.sort((a, b) => b.level - a.level);
+      case "constellation-asc":
+        return charactersCopy.sort((a, b) => a.constellation - b.constellation);
+      case "constellation-desc":
+        return charactersCopy.sort((a, b) => b.constellation - a.constellation);
+      default:
+        return charactersCopy;
+    }
+  }, [genshinData, sortOrder]);
 
   if (!genshinData) {
     return <p>Loading character data...</p>;
@@ -98,29 +153,44 @@ export default function CharactersPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">All Characters</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">All Characters</h1>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sort-order" className="text-sm font-medium">Sort by:</label>
+            <select
+              id="sort-order"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="bg-white border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+            >
+              <option value="level-desc">Level (High to Low)</option>
+              <option value="level-asc">Level (Low to High)</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="constellation-desc">Constellation (High to Low)</option>
+              <option value="constellation-asc">Constellation (Low to High)</option>
+            </select>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {genshinData.characters.map((character, index) => (
+          {sortedCharacters.map((character, index) => (
             <Card key={index}>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-4">
                   <div className="relative w-12 h-12">
                     <Image
-                      src={`/character-portraits/${formatCharacterIconFilename(
-                        character.key
-                      )}`}
+                      src={
+                        imageErrors.has(character.key)
+                          ? "/placeholder.svg"
+                          : `/character-portraits/${formatCharacterIconFilename(
+                              character.key
+                            )}`
+                      }
                       alt={character.key}
                       layout="fill"
                       objectFit="cover"
                       className=""
-                      onError={(e) => {
-                        console.error(
-                          `Failed to load image for ${
-                            character.key
-                          }: ${formatCharacterIconFilename(character.key)}`
-                        );
-                        e.currentTarget.src = "/placeholder.svg";
-                      }}
+                      onError={() => handleImageError(character.key)}
                     />
                   </div>
                   <span>{character.key}</span>

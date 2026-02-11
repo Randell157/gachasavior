@@ -21,6 +21,7 @@ interface GenshinData {
 
 export default function WeaponsPage() {
   const [genshinData, setGenshinData] = useState<GenshinData | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
   useEffect(() => {
@@ -35,7 +36,11 @@ export default function WeaponsPage() {
         }
       }
     }
-  }, [user]);
+  }, [user?.uid]);
+
+  const handleImageError = (weaponKey: string) => {
+    setImageErrors((prev) => new Set(prev).add(weaponKey));
+  };
 
   if (!genshinData) {
     return <p>Loading weapon data...</p>;
@@ -47,20 +52,25 @@ export default function WeaponsPage() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">All Weapons</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {genshinData.weapons.map((weapon, index) => (
+          {(genshinData.weapons ?? []).map((weapon, index) => (
             <Card key={index}>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-4">
                   <div className="relative w-12 h-12">
                     <Image
-                      src={`/weapon-icons/${weapon.key.replace(/\s+/g, '_')}.png`}
+                      src={
+                        imageErrors.has(weapon.key)
+                          ? "/placeholder.svg"
+                          : `/weapon-icons/${weapon.key.replace(
+                              /\s+/g,
+                              "_"
+                            )}.png`
+                      }
                       alt={weapon.key}
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
-                      onError={(e) => {
-                        e.currentTarget.src = "/placeholder.svg";
-                      }}
+                      onError={() => handleImageError(weapon.key)}
                     />
                   </div>
                   <span>{weapon.key}</span>

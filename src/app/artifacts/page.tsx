@@ -44,6 +44,7 @@ function formatArtifactName(artifact: Artifact): string {
 
 export default function ArtifactsPage() {
   const [genshinData, setGenshinData] = useState<GenshinData | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const { user } = useAuth();
 
   useEffect(() => {
@@ -58,7 +59,11 @@ export default function ArtifactsPage() {
         }
       }
     }
-  }, [user]);
+  }, [user?.uid]);
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => new Set(prev).add(index));
+  };
 
   if (!genshinData) {
     return <p>Loading artifact data...</p>;
@@ -70,27 +75,25 @@ export default function ArtifactsPage() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">All Artifacts</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {genshinData.artifacts.map((artifact, index) => (
+          {(genshinData.artifacts ?? []).map((artifact, index) => (
             <Card key={index}>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-4">
                   <div className="relative w-12 h-12">
                     <Image
                       src={
-                        artifact.setKey
-                          ? `/artifact-icons/${artifact.setKey.replace(
+                        imageErrors.has(index) || !artifact.setKey
+                          ? "/placeholder.svg"
+                          : `/artifact-icons/${artifact.setKey.replace(
                               /\s+/g,
                               "_"
                             )}.png`
-                          : "/placeholder.svg"
                       }
                       alt={formatArtifactName(artifact)}
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
-                      onError={(e) => {
-                        e.currentTarget.src = "/placeholder.svg";
-                      }}
+                      onError={() => handleImageError(index)}
                     />
                   </div>
                   <span>{formatArtifactName(artifact)}</span>

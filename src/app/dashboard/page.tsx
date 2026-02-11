@@ -13,7 +13,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 interface GenshinData {
-  characters: Array<{
+  format?: string;
+  version?: number;
+  kamera_version?: string;
+  source?: string;
+  characters?: Array<{
     key: string;
     level: number;
     constellation: number;
@@ -29,18 +33,18 @@ interface GenshinData {
       rarity: number;
     }>;
   }>;
-  weapons: Array<{
+  weapons?: Array<{
     key: string;
     level: number;
     refinement: number;
   }>;
-  artifacts: Array<{
+  artifacts?: Array<{
     setKey: string;
     slotKey: string;
     level: number;
     rarity: number;
   }>;
-  materials: Record<string, number>;
+  materials?: Record<string, number>;
 }
 
 export default function DashboardPage() {
@@ -110,10 +114,10 @@ export default function DashboardPage() {
   const validateGenshinData = (data: any): data is GenshinData => {
     return (
       data &&
-      Array.isArray(data.characters) &&
-      Array.isArray(data.weapons) &&
-      Array.isArray(data.artifacts) &&
-      typeof data.materials === "object"
+      (Array.isArray(data.characters) ||
+        Array.isArray(data.weapons) ||
+        Array.isArray(data.artifacts) ||
+        (typeof data.materials === "object" && data.materials !== null))
     );
   };
 
