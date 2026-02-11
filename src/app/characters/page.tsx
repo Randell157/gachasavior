@@ -9,6 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import {
+  formatCharacterDisplayName,
+  formatWeaponDisplayName,
+  formatArtifactSetDisplayName,
+} from "@/lib/utils";
 
 interface Weapon {
   key: string;
@@ -40,10 +45,7 @@ interface GenshinData {
 
 function formatArtifactName(artifact: Artifact): string {
   if (artifact.setKey) {
-    return artifact.setKey
-      .split(/(?=[A-Z])/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    return formatArtifactSetDisplayName(artifact.setKey);
   }
   return "Unknown Artifact";
 }
@@ -188,14 +190,14 @@ export default function CharactersPage() {
                               character.key
                             )}`
                       }
-                      alt={character.key}
+                      alt={formatCharacterDisplayName(character.key)}
                       layout="fill"
                       objectFit="cover"
                       className=""
                       onError={() => handleImageError(character.key)}
                     />
                   </div>
-                  <span>{character.key}</span>
+                  <span>{formatCharacterDisplayName(character.key)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -206,7 +208,7 @@ export default function CharactersPage() {
                   <h3 className="font-semibold mt-4">Weapon</h3>
                   {character.weapon ? (
                     <>
-                      <p>Name: {character.weapon.key}</p>
+                      <p>Name: {formatWeaponDisplayName(character.weapon.key)}</p>
                       <p>Level: {character.weapon.level}</p>
                       <p>Refinement: {character.weapon.refinement}</p>
                     </>

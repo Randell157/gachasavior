@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { formatWeaponDisplayName } from "@/lib/utils";
 
 interface Weapon {
   key: string;
@@ -66,14 +67,14 @@ export default function WeaponsPage() {
                               "_"
                             )}.png`
                       }
-                      alt={weapon.key}
+                      alt={formatWeaponDisplayName(weapon.key)}
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
                       onError={() => handleImageError(weapon.key)}
                     />
                   </div>
-                  <span>{weapon.key}</span>
+                  <span>{formatWeaponDisplayName(weapon.key)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>

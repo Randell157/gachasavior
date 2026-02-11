@@ -145,6 +145,7 @@ export default function DashboardPage() {
               <Genshin
                 initialData={genshinData}
                 onInvalidData={handleInvalidData}
+                userId={user?.uid}
               />
             )}
             <div className="pt-8 mt-8 border-t border-gray-200 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">

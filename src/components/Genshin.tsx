@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -14,7 +14,20 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  formatCharacterDisplayName,
+  formatWeaponDisplayName,
+  formatArtifactSetDisplayName,
+  formatMaterialDisplayName,
+} from "@/lib/utils";
 
 interface Weapon {
   key: string;
@@ -50,9 +63,13 @@ interface GenshinData {
   materials?: Record<string, number>;
 }
 
+const SHOWCASE_SIZE = 5;
+const SHOWCASE_STORAGE_KEY = "genshinShowcase";
+
 interface GenshinProps {
   initialData: GenshinData | null;
   onInvalidData: () => void;
+  userId?: string | null;
 }
 
 function formatCharacterIconFilename(characterKey: string): string {
@@ -82,16 +99,45 @@ function formatCharacterIconFilename(characterKey: string): string {
   return `${formattedKey}_Icon.png`;
 }
 
-export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
+export default function Genshin({ initialData, onInvalidData, userId }: GenshinProps) {
   const [data, setData] = useState<GenshinData | null>(initialData);
   const [activeTab, setActiveTab] = useState("characters");
   const [error, setError] = useState<string | null>(null);
+  const [showcaseKeys, setShowcaseKeys] = useState<(string | null)[]>(() =>
+    Array(SHOWCASE_SIZE).fill(null)
+  );
+  const skipNextSaveRef = useRef(true);
 
   useEffect(() => {
     if (initialData) {
       validateData(initialData);
     }
   }, [initialData]);
+
+  useEffect(() => {
+    if (!userId || !data?.characters?.length) return;
+    try {
+      const stored = localStorage.getItem(`${SHOWCASE_STORAGE_KEY}_${userId}`);
+      if (stored) {
+        const parsed = JSON.parse(stored) as string[];
+        if (Array.isArray(parsed) && parsed.length === SHOWCASE_SIZE) {
+          const valid = parsed.map((k) => (k && data.characters?.some((c) => c.key === k) ? k : null));
+          setShowcaseKeys(valid);
+        }
+      }
+    } catch {
+      // ignore invalid stored data
+    }
+  }, [userId, data?.characters]);
+
+  useEffect(() => {
+    if (!userId) return;
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
+    localStorage.setItem(`${SHOWCASE_STORAGE_KEY}_${userId}`, JSON.stringify(showcaseKeys));
+  }, [userId, showcaseKeys]);
 
   const validateData = (data: GenshinData | null) => {
     if (!data) {
@@ -155,14 +201,35 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
     }
   });
 
-  const topCharacters = (data.characters ?? [])
-    .sort((a, b) => b.level - a.level)
-    .slice(0, 5)
-    .map(char => ({
-      ...char,
-      weapon: characterEquipment[char.key]?.weapon,
-      artifacts: characterEquipment[char.key]?.artifacts,
-    }));
+  const allCharacters = (data.characters ?? []).sort((a, b) =>
+    a.key.localeCompare(b.key)
+  );
+  const showcaseCharacters = showcaseKeys
+    .filter((k): k is string => !!k)
+    .map((key) => {
+      const char = data.characters?.find((c) => c.key === key);
+      if (!char) return null;
+      return {
+        ...char,
+        weapon: characterEquipment[char.key]?.weapon,
+        artifacts: characterEquipment[char.key]?.artifacts,
+      };
+    })
+    .filter(Boolean) as Array<Character & { weapon?: Weapon; artifacts?: Artifact[] }>;
+
+  const setShowcaseSlot = (index: number, characterKey: string | null) => {
+    setShowcaseKeys((prev) => {
+      const next = [...prev];
+      next[index] = characterKey;
+      return next;
+    });
+  };
+
+  const getOptionsForSlot = (slotIndex: number) =>
+    allCharacters.filter(
+      (c) =>
+        !showcaseKeys.some((k, i) => i !== slotIndex && k === c.key)
+    );
 
   const topWeapons = (data.weapons ?? []).sort((a, b) => b.level - a.level).slice(0, 5);
 
@@ -225,82 +292,110 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
         <TabsContent value="characters">
           <Card>
             <CardHeader>
-              <CardTitle>Top Characters</CardTitle>
+              <CardTitle>Character Showcase</CardTitle>
               <CardDescription>
-                Highest level characters with their equipment
+                Select up to 5 characters to display
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px]">
-                {topCharacters.length > 0 ? (
-                  <ul>
-                    {topCharacters.map((char, index) => (
-                      <li
-                        key={index}
-                        className="mb-6 pb-4 border-b border-gray-200 last:border-b-0"
-                      >
-                        <div className="flex items-center space-x-4 mb-2">
-                          <Image
-                            src={`/character-portraits/${formatCharacterIconFilename(
-                              char.key
-                            )}`}
-                            alt={char.key}
-                            width={50}
-                            height={50}
-                            className=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = "/placeholder.svg";
-                            }}
-                          />
-                          <div>
-                            <span className="font-bold text-lg">
-                              {char.key}
-                            </span>
-                            <p className="text-sm text-gray-500">
-                              Level {char.level}, Constellation{" "}
-                              {char.constellation}
-                            </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {Array.from({ length: SHOWCASE_SIZE }, (_, i) => (
+                    <Select
+                      key={i}
+                      value={showcaseKeys[i] ?? "__none__"}
+                      onValueChange={(v) =>
+                        setShowcaseSlot(i, v === "__none__" ? null : v)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select character" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">
+                          Select character
+                        </SelectItem>
+                        {getOptionsForSlot(i).map((c) => (
+                          <SelectItem key={c.key} value={c.key}>
+                            {formatCharacterDisplayName(c.key)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ))}
+                </div>
+                {showcaseCharacters.length > 0 ? (
+                  <ScrollArea className="h-[400px]">
+                    <ul>
+                      {showcaseCharacters.map((char, index) => (
+                        <li
+                          key={char.key}
+                          className="mb-6 pb-4 border-b border-gray-200 last:border-b-0"
+                        >
+                          <div className="flex items-center space-x-4 mb-2">
+                            <Image
+                              src={`/character-portraits/${formatCharacterIconFilename(
+                                char.key
+                              )}`}
+                              alt={formatCharacterDisplayName(char.key)}
+                              width={50}
+                              height={50}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "/placeholder.svg";
+                              }}
+                            />
+                            <div>
+                              <span className="font-bold text-lg">
+                                {formatCharacterDisplayName(char.key)}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                Level {char.level}, Constellation{" "}
+                                {char.constellation}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        {char.weapon && (
-                          <div className="ml-14 mb-2">
-                            <p className="text-sm">
-                              <span className="font-semibold">Weapon:</span>{" "}
-                              {char.weapon.key} (Lv. {char.weapon.level}, R
-                              {char.weapon.refinement})
+                          {char.weapon && (
+                            <div className="ml-14 mb-2">
+                              <p className="text-sm">
+                                <span className="font-semibold">Weapon:</span>{" "}
+                                {formatWeaponDisplayName(char.weapon.key)} (Lv. {char.weapon.level}, R
+                                {char.weapon.refinement})
+                              </p>
+                            </div>
+                          )}
+                          {char.artifacts && char.artifacts.length > 0 ? (
+                            <div className="ml-14">
+                              <p className="text-sm font-semibold mb-1">
+                                Artifacts:
+                              </p>
+                              <ul className="list-disc list-inside">
+                                {char.artifacts.map((artifact, artifactIndex) => (
+                                  <li
+                                    key={artifactIndex}
+                                    className="text-sm ml-4"
+                                  >
+                                    {formatArtifactSetDisplayName(artifact.setKey)} {artifact.slotKey} (Lv.{" "}
+                                    {artifact.level}, {artifact.rarity}★)
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : (
+                            <p className="ml-14 text-sm">
+                              No artifacts equipped.
                             </p>
-                          </div>
-                        )}
-                        {char.artifacts && char.artifacts.length > 0 ? (
-                          <div className="ml-14">
-                            <p className="text-sm font-semibold mb-1">
-                              Artifacts:
-                            </p>
-                            <ul className="list-disc list-inside">
-                              {char.artifacts.map((artifact, artifactIndex) => (
-                                <li
-                                  key={artifactIndex}
-                                  className="text-sm ml-4"
-                                >
-                                  {artifact.setKey} {artifact.slotKey} (Lv.{" "}
-                                  {artifact.level}, {artifact.rarity}★)
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ) : (
-                          <p className="ml-14 text-sm">
-                            No artifacts equipped.
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </ScrollArea>
                 ) : (
-                  <p>No character data available. Please upload a JSON file.</p>
+                  <p className="text-sm text-muted-foreground py-4">
+                    Select characters from the dropdowns above to show them here.
+                  </p>
                 )}
-              </ScrollArea>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -316,7 +411,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
                   <ul>
                     {topWeapons.map((weapon, index) => (
                       <li key={index} className="mb-2">
-                        <span className="font-bold">{weapon.key}</span> - Level{" "}
+                        <span className="font-bold">{formatWeaponDisplayName(weapon.key)}</span> - Level{" "}
                         {weapon.level}, Refinement {weapon.refinement}
                       </li>
                     ))}
@@ -343,7 +438,7 @@ export default function Genshin({ initialData, onInvalidData }: GenshinProps) {
                       .slice(0, 20)
                       .map(([material, count], index) => (
                         <li key={index} className="mb-2">
-                          <span className="font-bold">{material}</span>: {count}
+                          <span className="font-bold">{formatMaterialDisplayName(material)}</span>: {count}
                         </li>
                       ))}
                   </ul>

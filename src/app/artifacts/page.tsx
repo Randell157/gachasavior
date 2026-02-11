@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatArtifactSetDisplayName } from "@/lib/utils";
 
 interface Artifact {
   key: string;
@@ -31,10 +32,7 @@ interface GenshinData {
 
 function formatArtifactName(artifact: Artifact): string {
   if (artifact.setKey) {
-    return artifact.setKey
-      .split(/(?=[A-Z])/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    return formatArtifactSetDisplayName(artifact.setKey);
   }
   if (artifact.set && artifact.slotKey) {
     return `${artifact.set} ${artifact.slotKey}`;
