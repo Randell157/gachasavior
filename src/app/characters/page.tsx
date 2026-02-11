@@ -14,12 +14,14 @@ interface Weapon {
   key: string;
   level: number;
   refinement: number;
+  location?: string;
 }
 
 interface Artifact {
   setKey: string;
   slotKey: string;
   level: number;
+  location?: string;
 }
 
 interface Character {
