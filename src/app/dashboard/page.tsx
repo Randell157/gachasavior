@@ -138,30 +138,35 @@ export default function DashboardPage() {
       <main className="flex-1">
         <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
           <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-            <div className="divide-y divide-gray-200">
-              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <p className="text-xl">Hello, {username || "User"}! Please import your Genshin JSON file. You can get this from using Inventory Kamera</p>
-                <div>
-                  <Input
-                    type="file"
-                    accept=".json"
-                    onChange={handleFileUpload}
-                    className="mb-4"
-                  />
-                </div>
-                {fileError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{fileError}</AlertDescription>
-                  </Alert>
-                )}
-              </div>
-              {genshinData && (
-                <Genshin
-                  initialData={genshinData}
-                  onInvalidData={handleInvalidData}
+            <p className="text-xl text-gray-700 sm:text-lg mb-6">
+              Hello, {username || "User"}!
+            </p>
+            {genshinData && (
+              <Genshin
+                initialData={genshinData}
+                onInvalidData={handleInvalidData}
+              />
+            )}
+            <div className="pt-8 mt-8 border-t border-gray-200 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+              <p className="text-xl">
+                {genshinData
+                  ? "Data uploaded. Would you like to reupload the data?"
+                  : "Please import your Genshin JSON file. You can get this from using Inventory Kamera."}
+              </p>
+              <div>
+                <Input
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  className="mb-4"
                 />
+              </div>
+              {fileError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{fileError}</AlertDescription>
+                </Alert>
               )}
             </div>
           </div>

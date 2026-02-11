@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -9,6 +12,24 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+
+function formatCharacterIconFilename(characterKey: string): string {
+  const specialNames: { [key: string]: string } = {
+    kaedeharakazuha: "Kaedehara_Kazuha",
+    hutao: "Hu_Tao",
+    ayaka: "Kamisato_Ayaka",
+    raidenshogun: "Raiden_Shogun",
+    yaemiko: "Yae_Miko",
+    yunjin: "Yun_Jin",
+    kukishinobu: "Kuki_Shinobu",
+    kujousara: "Kujou_Sara",
+    shikanoinheizou: "Shikanoin_Heizou",
+  };
+  const lowerCaseKey = characterKey.toLowerCase().replace(/\s+/g, "");
+  if (lowerCaseKey.startsWith("traveler")) return "Aether_Icon.png";
+  if (lowerCaseKey in specialNames) return `${specialNames[lowerCaseKey]}_Icon.png`;
+  return `${characterKey.replace(/\s+/g, "_")}_Icon.png`;
+}
 
 const features = [
   {
@@ -156,11 +177,25 @@ export default function Features() {
                                 key={index}
                                 className="mb-4 pb-4 border-b border-gray-200 last:border-b-0"
                               >
-                                <span className="font-bold text-lg">{char.name}</span>
-                                <p className="text-sm text-gray-500">
-                                  Level {char.level}, Constellation {char.constellation}
-                                </p>
-                                <p className="text-sm mt-1">
+                                <div className="flex items-center space-x-4 mb-2">
+                                  <Image
+                                    src={`/character-portraits/${formatCharacterIconFilename(char.name)}`}
+                                    alt={char.name}
+                                    width={50}
+                                    height={50}
+                                    onError={(e) => {
+                                      e.currentTarget.onerror = null;
+                                      e.currentTarget.src = "/placeholder.svg";
+                                    }}
+                                  />
+                                  <div>
+                                    <span className="font-bold text-lg">{char.name}</span>
+                                    <p className="text-sm text-gray-500">
+                                      Level {char.level}, Constellation {char.constellation}
+                                    </p>
+                                  </div>
+                                </div>
+                                <p className="text-sm ml-14">
                                   <span className="font-semibold">Weapon:</span> {char.weapon}
                                 </p>
                               </li>
