@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -7,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
@@ -44,114 +46,172 @@ const features = [
 
 export default function Features() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-indigo-900">
-            Gacha Savior Features
-          </h1>
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-            <div className="py-4 sm:py-5 sm:px-6">
-              <h3 className="text-lg font-medium text-gray-900">
-                Genshin Impact Dashboard Features
-              </h3>
-              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
-                {features.map((feature, index) => (
-                  <Card key={index}>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        {feature.title}
-                      </CardTitle>
-                      <CardDescription>{feature.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc pl-5 space-y-1">
-                        {feature.details.map((detail, detailIndex) => (
-                          <li key={detailIndex}>{detail}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-            <div className="py-4 sm:py-5 sm:px-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Dashboard Preview Sample
-              </h3>
-              <Card className="w-full max-w-3xl mx-auto">
-                <CardContent className="p-6">
-                  <Tabs defaultValue="characters" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="characters">Characters</TabsTrigger>
-                      <TabsTrigger value="weapons">Weapons</TabsTrigger>
-                      <TabsTrigger value="materials">Materials</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="characters">
-                      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                        <h4 className="font-semibold mb-2">Top Characters</h4>
-                        <ul className="space-y-2">
-                          <li>
-                            Ganyu - Level 90, Constellation 2 Weapon: Artifacts:
-                          </li>
-                          <li>
-                            Diluc - Level 88, Constellation 1 Weapon: Artifacts:
-                          </li>
-                          <li>
-                            Venti - Level 85, Constellation 0 Weapon: Artifacts:
-                          </li>
-                          <li>
-                            Keqing - Level 82, Constellation 3 Weapon:
-                            Artifacts:
-                          </li>
-                          <li>
-                            Zhongli - Level 80, Constellation 0 Weapon:
-                            Artifacts:
-                          </li>
-                        </ul>
-                      </ScrollArea>
-                    </TabsContent>
-                    <TabsContent value="weapons">
-                      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                        <h4 className="font-semibold mb-2">Top Weapons</h4>
-                        <ul className="space-y-2">
-                          <li>Wolf's Gravestone - Level 90, Refinement 1</li>
-                          <li>Skyward Harp - Level 90, Refinement 2</li>
-                          <li>
-                            Primordial Jade Winged-Spear - Level 85, Refinement
-                            1
-                          </li>
-                          <li>Aquila Favonia - Level 80, Refinement 1</li>
-                          <li>
-                            Lost Prayer to the Sacred Winds - Level 80,
-                            Refinement 1
-                          </li>
-                        </ul>
-                      </ScrollArea>
-                    </TabsContent>
-                    <TabsContent value="materials">
-                      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                        <h4 className="font-semibold mb-2">Top Materials</h4>
-                        <ul className="space-y-2">
-                          <li>Mora - 5,000,000</li>
-                          <li>Hero's Wit - 500</li>
-                          <li>Mystic Enhancement Ore - 1000</li>
-                          <li>Primogem - 10,000</li>
-                          <li>Fragile Resin - 50</li>
-                        </ul>
-                      </ScrollArea>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
+    <>
+      {/* Feature list section */}
+        <div className="bg-gradient-to-b from-indigo-100 to-purple-100 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-indigo-900 mb-6">
+              Genshin Impact Dashboard Features
+            </h2>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
+              {features.map((feature, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {feature.title}
+                    </CardTitle>
+                    <CardDescription>{feature.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {feature.details.map((detail, detailIndex) => (
+                        <li key={detailIndex}>{detail}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Dashboard preview — matches logged-in dashboard layout */}
+        <div className="bg-gray-100 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 className="text-lg font-medium text-gray-900 mb-8">
+              Dashboard Preview Sample
+            </h3>
+            <div className="bg-white shadow-lg rounded-3xl p-6 sm:p-8 lg:p-10">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Genshin Impact</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Characters</CardTitle>
+                      <CardDescription>Total owned</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-4xl font-bold">42</p>
+                      <div className="mt-4">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href="/login">View All Characters</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Weapons</CardTitle>
+                      <CardDescription>Total owned</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-4xl font-bold">156</p>
+                      <div className="mt-4">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href="/login">View All Weapons</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Artifacts</CardTitle>
+                      <CardDescription>Total owned</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-4xl font-bold">284</p>
+                      <div className="mt-4">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href="/login">View All Artifacts</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Tabs defaultValue="characters" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="characters">Characters</TabsTrigger>
+                    <TabsTrigger value="weapons">Weapons</TabsTrigger>
+                    <TabsTrigger value="materials">Materials</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="characters">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Top Characters</CardTitle>
+                        <CardDescription>
+                          Highest level characters with their equipment
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[280px]">
+                          <ul>
+                            {[
+                              { name: "Ganyu", level: 90, constellation: 2, weapon: "Amos' Bow (Lv. 90, R1)" },
+                              { name: "Diluc", level: 88, constellation: 1, weapon: "Wolf's Gravestone (Lv. 90, R1)" },
+                              { name: "Venti", level: 85, constellation: 0, weapon: "Skyward Harp (Lv. 85, R2)" },
+                              { name: "Keqing", level: 82, constellation: 3, weapon: "Primordial Jade Cutter (Lv. 80, R1)" },
+                              { name: "Zhongli", level: 80, constellation: 0, weapon: "Staff of Homa (Lv. 90, R1)" },
+                            ].map((char, index) => (
+                              <li
+                                key={index}
+                                className="mb-4 pb-4 border-b border-gray-200 last:border-b-0"
+                              >
+                                <span className="font-bold text-lg">{char.name}</span>
+                                <p className="text-sm text-gray-500">
+                                  Level {char.level}, Constellation {char.constellation}
+                                </p>
+                                <p className="text-sm mt-1">
+                                  <span className="font-semibold">Weapon:</span> {char.weapon}
+                                </p>
+                              </li>
+                            ))}
+                          </ul>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="weapons">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Top Weapons</CardTitle>
+                        <CardDescription>Highest level weapons</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[200px]">
+                          <ul className="space-y-2">
+                            <li><span className="font-bold">Wolf's Gravestone</span> - Level 90, Refinement 1</li>
+                            <li><span className="font-bold">Skyward Harp</span> - Level 90, Refinement 2</li>
+                            <li><span className="font-bold">Primordial Jade Winged-Spear</span> - Level 85, Refinement 1</li>
+                            <li><span className="font-bold">Aquila Favonia</span> - Level 80, Refinement 1</li>
+                            <li><span className="font-bold">Lost Prayer to the Sacred Winds</span> - Level 80, Refinement 1</li>
+                          </ul>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="materials">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Material Inventory</CardTitle>
+                        <CardDescription>Top materials owned</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[200px]">
+                          <ul className="space-y-2">
+                            <li><span className="font-bold">Mora</span>: 5,000,000</li>
+                            <li><span className="font-bold">Hero's Wit</span>: 500</li>
+                            <li><span className="font-bold">Mystic Enhancement Ore</span>: 1000</li>
+                            <li><span className="font-bold">Primogem</span>: 10,000</li>
+                            <li><span className="font-bold">Fragile Resin</span>: 50</li>
+                          </ul>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+            </div>
+          </div>
+        </div>
+    </>
   );
 }

@@ -2,12 +2,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import Genshin from "@/components/Genshin";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -72,15 +69,6 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [user, loading, router]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.push("/login");
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -175,11 +163,6 @@ export default function DashboardPage() {
                   onInvalidData={handleInvalidData}
                 />
               )}
-              <div className="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
-                <Button onClick={handleLogout} variant="destructive">
-                  Logout
-                </Button>
-              </div>
             </div>
           </div>
         </div>
